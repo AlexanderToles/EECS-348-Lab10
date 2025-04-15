@@ -7,16 +7,66 @@ using namespace std;
 void validate_expression(vector<string> file_data){
     string valid_chars = "-+0123456789";
     for(int i = 0; i < file_data.size();++i){
-        cout << "String: " << file_data[i] << "\n";
-        bool valid;
-        bool operator_flag;
-        size_t found = file_data[i].find_first_not_of("-+0123456789.");
+        bool invalid = 0;
+        bool operator_flag = 0;
+        bool decimal_flag = 0;
+
+        //check if any of the characters are not valid.
+        size_t found = file_data[i].find_first_not_of("-+0123456789."); 
         if(found!=string::npos){
-            valid = 0;
-            cout << file_data[i] << ": not valid.\n";
+            invalid = 1;
         }
-        if(file_data[i][0] == '+'|| file_data[i][0] == '-'){
+
+        //check for operator, set flag
+        if((file_data[i][0] == '+')||( file_data[i][0] == '-')){
             operator_flag = 1;
+        }
+
+        //go through every char, check validation
+        for(int j = 0; j < file_data[i].length();++j){
+            //check for duplicated decimals
+            if(file_data[i][j] == '.'){
+                if(decimal_flag){
+                    invalid = 1;
+                }
+                else{
+                    decimal_flag = 1;
+                }
+            }
+            //check for duplicated operators
+            if(j>0 && ((file_data[i][j] == '+' )|| (file_data[i][j] == '-' ))){
+                if(operator_flag){
+                    invalid = 1;
+                }
+            }
+        }
+        
+        if(invalid){
+            cout << "string: " << file_data[i] << " is invalid.\n";
+        }
+        else{ //clean the string, adding a decimal if needed, removing trailing zeros.
+            //if there is not a decimal, add a decimal and a 0
+            //if there is a decimal, remove trailing 0s
+            if(!decimal_flag){
+                file_data[i] = file_data[i]+".0";
+            }
+            else{
+                while(file_data[i][file_data[i].length()-1]=='0'){
+                    file_data[i].pop_back();
+                }
+            }
+            //remove leading 0s
+            if(operator_flag){
+                while(file_data[i][1]=='0' && file_data[i][2]!='.'){
+                    file_data[i].erase(file_data[i].begin()+1,file_data[i].begin()+2);
+                }
+            }
+            else{
+                while(file_data[i][0]=='0' && file_data[i][1]!='.'){
+                    file_data[i].erase(file_data[i].begin(),file_data[i].begin()+1);
+                }
+            }
+            cout << "string: " << file_data[i] << "\n";
         }
     }
     
