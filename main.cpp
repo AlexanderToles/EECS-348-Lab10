@@ -4,21 +4,35 @@
 #include <fstream>
 using namespace std;
 
-void scanFile(vector<string> fileData){
-
+void validate_expression(vector<string> file_data){
+    string valid_chars = "-+0123456789";
+    for(int i = 0; i < file_data.size();++i){
+        cout << "String: " << file_data[i] << "\n";
+        bool valid;
+        bool operator_flag;
+        size_t found = file_data[i].find_first_not_of("-+0123456789.");
+        if(found!=string::npos){
+            valid = 0;
+            cout << file_data[i] << ": not valid.\n";
+        }
+        if(file_data[i][0] == '+'|| file_data[i][0] == '-'){
+            operator_flag = 1;
+        }
+    }
+    
 }
 
 
-bool verify(string fileName){ //check if the input file is able to be opened
-    fstream inputFile;
-    inputFile.open(fileName, fstream::in);
-    if(inputFile.is_open()){
+bool verify(string file_name){ //check if the input file is able to be opened
+    fstream input_file;
+    input_file.open(file_name, fstream::in);
+    if(input_file.is_open()){
         string line;
-        vector<string> fileData;
-        while(getline(inputFile,line)){ //create a vector containing each of the lines
-            fileData.push_back(line);
+        vector<string> file_data;
+        while(getline(input_file,line)){ //create a vector containing each of the lines
+            file_data.push_back(line);
         }
-        scanFile(fileData);    //pass vector to the scanFile function
+        validate_expression(file_data);    //pass vector to the scanFile function
         return 1;
     }
     else{
@@ -29,10 +43,10 @@ bool verify(string fileName){ //check if the input file is able to be opened
 
 int main() {
     while(true){ //prompt user for input file name until valid name is chosen
-        string fileName;
+        string file_name;
         cout << "Enter file name: ";
-        cin >> fileName;
-        if(verify(fileName)){ //check if file was able to be opened
+        cin >> file_name;
+        if(verify(file_name)){ //check if file was able to be opened
             break;
         }
     }
