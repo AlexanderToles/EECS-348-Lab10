@@ -3,6 +3,62 @@
 #include <string>
 #include <fstream>
 using namespace std;
+string addition(string expression){
+    const string number = "-123.456";
+    string sum;
+    bool add = 0;
+    if(expression[0]=='-'){
+        add = 1;
+    }
+    size_t exp_pos = expression.find_first_of(".");
+    size_t num_pos = number.find_first_of(".");
+    int part_sum;
+    int result;
+    int count;
+    if(exp_pos > num_pos){
+        char carry = 0;
+        count = exp_pos-1;
+        for(int i = num_pos-1  ;i > 0;--i){
+            int summand_1 = number[i] - '0';
+            int summand_2 = expression[count] - '0';
+            int result = summand_1 + summand_2+carry;
+            cout << number[i] << ", " << expression[count];
+            cout <<", "<< result <<"\n";
+            if(result>10){
+                carry = 1;
+                part_sum = result-10;
+                sum.insert(0,1,'0'+ part_sum);
+                cout << sum << "\n";
+            }
+            else{
+                carry = 0;
+                sum.insert(0,1,'0'+result);
+                cout << sum << "\n";
+            }
+
+            count--;
+        }
+        for(int i = exp_pos-num_pos;i >= 0; --i){
+            int summand_1 = expression[i] - '0';
+            int result = summand_1+carry;
+            cout <<result <<"\n";
+            if(result>10){
+                carry = 1;
+                part_sum = result-10;
+                sum.insert(0,1,'0'+ part_sum);
+                cout << sum << "\n";
+            }
+            else{
+                carry = 0;
+                sum.insert(0,1,'0'+result);
+                cout << sum << "\n";
+            }
+            count--;
+        }
+    }
+    return sum;
+
+}
 double convert_expression(const string &expression){
     double parsed_num = 0.0;
     int offset = 0;
@@ -10,22 +66,16 @@ double convert_expression(const string &expression){
         offset=1;
     }
     size_t found = expression.find_first_of("."); 
-    //cout << "pos: " << found << " length: " << expression.length()<< "\n";
     for(int i = offset;i < found;++i){
-        //cout << "i: " << i << " expression[i]: " << expression[i] << "\n";
         int val = expression[i]-'0';
         parsed_num+=(val)*pow(10,found-i-1);
     }
-    //cout << "After pre-decimal: " << parsed_num << " \n";
     int dec_place = 0;
     for(int i = found+1;i < expression.length();++i){
         dec_place++;
-        //cout << "i: " << i << " expression[i]: " << expression[i] << " dec_place: "<<dec_place<<"\n";
         int val = expression[i]-'0';
-        //cout << "(val)*pow(0.1,dec_place): " << (val)*pow(0.1,dec_place) << "\n"; 
         parsed_num+=(val)*pow(0.1,dec_place);
     }
-        //cout << "After post-decimal: " << parsed_num << " \n";
     if(expression[0]=='-'){
         parsed_num*=-1;
     }
@@ -96,7 +146,7 @@ void validate_expression(vector<string> file_data){
                 }
             }
             //cout << "string: " << file_data[i] << "\n";
-            convert_expression(file_data[i]);
+            addition(file_data[i]);
         }
     }
     
