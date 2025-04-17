@@ -12,37 +12,90 @@ string addition(string expression){
     }
     size_t exp_pos = expression.find_first_of(".");
     size_t num_pos = number.find_first_of(".");
+
     int part_sum;
     int result;
-    int count;
-    if(exp_pos > num_pos){
-        char carry = 0;
-        count = exp_pos-1;
-        for(int i = num_pos-1  ;i > 0;--i){
-            int summand_1 = number[i] - '0';
-            int summand_2 = expression[count] - '0';
-            int result = summand_1 + summand_2+carry;
-            cout << number[i] << ", " << expression[count];
-            cout <<", "<< result <<"\n";
-            if(result>10){
-                carry = 1;
-                part_sum = result-10;
-                sum.insert(0,1,'0'+ part_sum);
-                cout << sum << "\n";
-            }
-            else{
-                carry = 0;
-                sum.insert(0,1,'0'+result);
-                cout << sum << "\n";
-            }
+    int sum_size = 0;
+    int carry = 0;
 
-            count--;
+    string string_1 = expression;
+    string string_2 = number;
+
+    int pos_1 = exp_pos;
+    int pos_2 = num_pos;
+
+    
+
+
+
+    if(expression.length()-exp_pos > number.length()-num_pos){
+        pos_1 = num_pos;
+        pos_2 = exp_pos;
+        string_2 = expression;
+        string_1 = number;
+    }
+
+    int count = pos_2+1;
+
+    for(int i = pos_2+1+(string_1.length()-pos_1);i > pos_2+2;--i){
+        int summand_1 = string_1[i] - '0';
+        int summand_2 = string_2[count] - '0';
+        result = summand_1 + summand_2+carry;
+        cout << string_1[i] << ", " << string_2[count];
+        cout <<", "<< result <<"\n";
+        if(result>=10){
+            carry = 1;
+            part_sum = result-10;
+            sum.insert(0,1,'0'+part_sum);
+            cout << sum << "\n";
         }
-        for(int i = exp_pos-num_pos;i >= 0; --i){
-            int summand_1 = expression[i] - '0';
-            int result = summand_1+carry;
-            cout <<result <<"\n";
-            if(result>10){
+        else{
+            carry = 0;
+            sum.insert(0,1,'0'+result);
+            cout << sum << "\n";
+        }
+
+        count++;
+    }
+    cout << "\nend"<< carry<<" \n\n";
+
+    for(int i = pos_2+(string_1.length()-pos_1);i < string_2.length(); ++i){
+        int summand_1 = string_2[i] - '0';
+        sum.push_back('0'+summand_1);
+        cout << sum << "\n";
+    }
+
+    sum.insert(0,1,'.');
+
+    cout << "\n\nintegers:\n\n";
+    //for decimals
+
+    
+    pos_2 = num_pos;
+    pos_1 = exp_pos;
+    string_1 = expression;
+    string_2 = number;
+
+    if(exp_pos > num_pos){
+        pos_1 = num_pos;
+        pos_2 = exp_pos;
+        string_2 = expression;
+        string_1 = number;
+    }
+
+    count = pos_2-1;
+
+
+    if(add){
+
+        //add the positive integer values
+        for(int i = pos_1-1  ;i > 0;--i){
+            int summand_1 = string_1[i] - '0';
+            int summand_2 = string_2[count] - '0';
+            result = summand_1 + summand_2+carry;
+            cout << string_1[i] << ", " << string_2[count];
+            cout <<", "<< result <<"\n";
+            if(result>=10){
                 carry = 1;
                 part_sum = result-10;
                 sum.insert(0,1,'0'+ part_sum);
@@ -53,9 +106,44 @@ string addition(string expression){
                 sum.insert(0,1,'0'+result);
                 cout << sum << "\n";
             }
+            sum_size++;
             count--;
         }
+
+        cout << "end \n";
+
+        for(int i = pos_2-pos_1;i > 0; --i){
+            int summand_1 = string_2[i] - '0';
+            cout << "String 2: "<< string_2[i] << "\n";
+            int result = summand_1+carry;
+            cout <<"result: "<<result <<"\n";
+            if(result>=10){
+                carry = 1;
+                part_sum = result-10;
+                sum.insert(0,1,'0'+ part_sum);
+                cout << sum << "\n";
+            }
+            else{
+                carry = 0;
+                sum.insert(0,1,'0'+result);
+                cout << sum << "\n";
+            }
+            sum_size++;
+            count--;
+        }
+        if(carry ==1){
+            sum.insert(0,1,'1');
+            cout << sum << "\n";
+        }
+        sum.insert(0,1,'-');
+        sum.push_back('.');
+        sum_size+=2;
+
+        cout << sum << "\n";
+
     }
+
+    
     return sum;
 
 }
