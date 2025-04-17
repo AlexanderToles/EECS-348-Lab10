@@ -1,8 +1,201 @@
+//  EECS 348 LAB 10
+//  Addition of doubles using string manipulation
+//  INPUT: Test file
+//  OUTPUT: String invalidity, string addition/subtraction
+//  ALEXANDER TOLES      
+//  APRIL 14 2025
+//  COLLABORATORS: ChatGPT (See line 77)
+
 #include <iostream>
 #include <vector>
 #include <string>
 #include <fstream>
 using namespace std;
+
+
+// checks if the given expression has a larger absolute value.
+// the result is used to make a result negative or positive
+
+bool compare(string expression){ 
+
+    string number = "123.456";
+
+    size_t exp_pos = expression.find_first_of(".");
+    size_t num_pos = number.find_first_of(".");
+
+    string max_string = expression;
+    string min_string = number;
+
+    bool exp = 1;
+
+    int max_pos = exp_pos;
+    int min_pos = num_pos;
+    
+
+    int max_dec_len = max(expression.length()-1-exp_pos,number.length()-1-num_pos);
+    int min_dec_len = min(number.length()-1-num_pos,expression.length()-1-exp_pos);
+
+    
+    if(expression.length()-1-exp_pos < number.length()-1-num_pos){
+        exp = 0;
+        max_string = number;
+        min_string = expression;
+        max_pos = num_pos;
+        min_pos = exp_pos;
+    }
+
+    //this code block takes the number with less decimal places, and adds trailing
+    //zeros until it has the same number of decimal places.
+
+    int dec_dif = max_dec_len - min_dec_len; //difference in decimal palces
+
+    for (int i = 0; i < dec_dif; i++) {
+        min_string.push_back('0');
+    }
+
+    //since they have the same number of decimal places, we can add leading zeros until
+    //the two strings are of the same length
+
+    while (max_string.length() != min_string.length()) {
+        if (max_string.length() > min_string.length()) {
+            min_string.insert(0, 1, '0');
+        } else {
+            max_string.insert(0, 1, '0');
+        }
+    }
+
+    for(int i = 0;i < max_pos;i++){
+        if(max_string[i] > min_string[i]){
+            if(exp){return 1;}else{return 0;}
+        }
+    }
+    for(int i = max_pos+1;i < max_string.length();++i){
+        if(max_string[i] > min_string[i]){
+            if(exp){return 1;}else{return 0;}
+        }
+    }
+    if(exp){return 0;}else{return 1;}
+}
+
+//to make this function easier to program, it always subtracts the larger number from 
+//the smaller, adding a sign afterwards if needed.
+
+//I used a suggestion by chatgpt, changing the variable names to 'a' and 'b' to be
+//more clear and concise
+string subtraction(string expression) {
+    
+    int sign = 0; //create sign variable, if sign is 1, then a sign is added to the result
+
+    if (compare(expression)) {
+        sign = 1;
+    }
+
+    string number = "-123.456"; 
+    string sum;
+
+    number.erase(0, 1); //remove the sign from the number 
+
+
+    // this code block finds the number of decimal and integer places
+
+    size_t exp_pos = expression.find_first_of("."); //gets the decimal postion
+    size_t num_pos = number.find_first_of(".");
+
+    string max_string = expression;
+    string min_string = number;
+    
+    int max_pos = exp_pos;
+
+    //finds the number of decimals in each
+
+    int max_dec_len = max(expression.length() - 1 - exp_pos, number.length() - 1 - num_pos);
+    int min_dec_len = min(expression.length() - 1 - exp_pos, number.length() - 1 - num_pos);
+
+
+    //makes sure the number with more decimal places is the max
+
+    if ((expression.length() - 1 - exp_pos) < (number.length() - 1 - num_pos)) {
+        max_string = number;
+        min_string = expression;
+        max_pos = num_pos;
+    }
+
+
+    //this code block is identical to the above block, adds leading and trailing zeros
+    //to make strings the same length
+
+    int dec_dif = max_dec_len - min_dec_len; //difference in decimal palces
+
+    for (int i = 0; i < dec_dif; i++) {
+        min_string.push_back('0');
+    }
+
+
+    while (max_string.length() != min_string.length()) {
+        if (max_string.length() > min_string.length()) {
+            min_string.insert(0, 1, '0');
+        } else {
+            max_string.insert(0, 1, '0');
+        }
+    }
+
+    max_pos = max_string.find_first_of(".");
+
+    int carry = 0;
+    int result = 0;
+
+    if (!sign) { //if the expression is less than, we swap the strings so num is the max
+        swap(max_string, min_string);
+    }
+
+    //start from the back of the strings, and end at the decimal place.
+
+    for (int i = max_string.length() - 1; i > max_pos; --i) {
+        //math is done by taking the ascii value of the digit, and subtracting the ascii
+        //value of the character '0'. since the values are in order, this will give a
+        //correspoding integer value.
+
+        int a = max_string[i] - '0';
+        int b = min_string[i] - '0' + carry;
+
+        //if the bottom is less than the top, we add 10 and subtract
+        if (b > a) {
+            a += 10;
+            carry = 1;
+        } else {
+            carry = 0;
+        }
+
+        result = a - b;
+        sum.insert(0, 1, '0' + result); //insert the result into the sum string
+    }
+
+    // insert the decimal point
+    sum.insert(0, 1, '.');
+
+    //start from the 1s place in the integer, going to the start of the string
+    for (int i = max_pos - 1; i >= 0; --i) {
+        int a = max_string[i] - '0';
+        int b = min_string[i] - '0' + carry;
+
+        if (b > a) {
+            a += 10;
+            carry = 1;
+        } else {
+            carry = 0;
+        }
+
+        result = a - b;
+        sum.insert(0, 1, '0' + result);
+    }
+
+    //add negative sign to the string
+    sum.insert(0, 1, '-');
+
+    cout << "sum: " <<sum << "\n";
+    return sum;
+}
+
 string addition(string expression){
 
     //step one, find which string has more decimal values
@@ -12,13 +205,13 @@ string addition(string expression){
 
     string number = "-123.456";
     string sum;
-    bool add = 0; //if the input number is negative, we add instead of subtracting.
 
     if(expression[0]=='-'){
-        add = 1;
         expression.erase(0,1);
         number.erase(0,1);
     }
+
+    
 
     //get the position of the decimal in each
 
@@ -32,7 +225,6 @@ string addition(string expression){
 
     int part_sum;
     int result;
-    int sum_size = 0;
     int carry = 0;
 
     string max_string = expression;
@@ -51,101 +243,84 @@ string addition(string expression){
         max_pos = num_pos;
         min_pos = exp_pos;
     }
-    int dec_dif = max_dec_len-min_dec_len;
-    int int_dif = (max_string.length()-max_dec_len)-(min_string.length()-min_dec_len);
-    for(int i = 0;i < dec_dif;i++){
+
+
+    
+    
+    //this code block is identical to the above block, adds leading and trailing zeros
+    //to make strings the same length
+
+    int dec_dif = max_dec_len - min_dec_len; //difference in decimal palces
+
+    for (int i = 0; i < dec_dif; i++) {
         min_string.push_back('0');
     }
-    while(max_string.length()!=min_string.length()){
-        if(max_string.length()>min_string.length()){
-            min_string.insert(0,1,'0');
-        }
-        else if (min_string.length()>max_string.length()){
-            max_string.insert(0,1,'0');
+
+    while (max_string.length() != min_string.length()) {
+        if (max_string.length() > min_string.length()) {
+            min_string.insert(0, 1, '0');
+        } else {
+            max_string.insert(0, 1, '0');
         }
     }
-    
+
     max_pos = max_string.find_first_of(".");
     min_pos = max_pos;
-
-    cout << "max decimal string: " << max_string << ", " << max_dec_len << "\n";
-    cout << "min decimal string: " << min_string << ", " << min_dec_len << "\n";
-
-    cout << "max_pos: " << max_pos << ", min_pos: " << min_pos << "\n"; 
-    
-
-
+    //start form the last decimal place, ending at the first
     for(int i = max_string.length()-1;i > max_pos;--i){
+
         int summand_1 = min_string[i] - '0';
         int summand_2 = max_string[i] - '0';
-        result = summand_1 + summand_2+carry;
-        cout << min_string[i] << ", " << max_string[i];
-        cout <<", "<< result <<"\n";
-        if(result>=10){
+
+        result = summand_1 + summand_2 + carry; //add together each digit, and the carry
+       
+        if(result>=10){ //carry if if the result is greater than 10
             carry = 1;
-            part_sum = result-10;
-            sum.insert(0,1,'0'+part_sum);
-            cout << sum << "\n";
+            part_sum = result-10; //the partial sum is the 1s place
+            sum.insert(0,1,'0'+part_sum); 
         }
-        else{
+        else{ //else insert the result
             carry = 0;
             sum.insert(0,1,'0'+result);
-            cout << sum << "\n";
         }
 
     }
-    sum.insert(0,1,'.');
-    cout << sum << "\n";
-    cout << "-----\n";
 
+    sum.insert(0,1,'.'); //insert decimal
+
+    //for integer values, start at the 1s place, end at the start of the string.
     for(int i = max_pos-1;i >= 0;--i){
         int summand_1 = min_string[i] - '0';
         int summand_2 = max_string[i] - '0';
         result = summand_1 + summand_2+carry;
-        cout << "i: "<<i<<", "<<min_string[i] << ", " << max_string[i];
-        cout <<", "<< result <<"\n";
+        
         if(result>=10){
             carry = 1;
             part_sum = result-10;
             sum.insert(0,1,'0'+part_sum);
-            cout << sum << "\n";
+            
         }
         else{
             carry = 0;
             sum.insert(0,1,'0'+result);
-            cout << sum << "\n";
         }
     }
+
+    //add negative sign
     sum.insert(0,1,'-');
-    cout << sum << "\n";
+
+    cout << "sum: " <<sum << "\n";
     return sum;
 }
-double convert_expression(const string &expression){
-    double parsed_num = 0.0;
-    int offset = 0;
-    if(expression[0]=='-'){
-        offset=1;
-    }
-    size_t found = expression.find_first_of("."); 
-    for(int i = offset;i < found;++i){
-        int val = expression[i]-'0';
-        parsed_num+=(val)*pow(10,found-i-1);
-    }
-    int dec_place = 0;
-    for(int i = found+1;i < expression.length();++i){
-        dec_place++;
-        int val = expression[i]-'0';
-        parsed_num+=(val)*pow(0.1,dec_place);
-    }
-    if(expression[0]=='-'){
-        parsed_num*=-1;
-    }
-    cout << "Expression " << expression << " , Double: " << parsed_num << "\n";
-    return parsed_num;
-}
+
+
+//takes in the file data, goes through each line, checks validity of the number,
+//cleans the number, and performs needed operation
+
 void validate_expression(vector<string> file_data){
-    string valid_chars = "-+0123456789";
+    string valid_chars = "-+0123456789"; //valid characters,
     for(int i = 0; i < file_data.size();++i){
+
         bool invalid = 0;
         bool operator_flag = 0;
         bool decimal_flag = 0;
@@ -206,8 +381,14 @@ void validate_expression(vector<string> file_data){
                     file_data[i].erase(file_data[i].begin(),file_data[i].begin()+1);
                 }
             }
-            //cout << "string: " << file_data[i] << "\n";
-            addition(file_data[i]);
+
+            //if the sign of the number is negative, we perform addtion, else we perform subtraction.
+            if(file_data[i][0]=='-'){
+                addition(file_data[i]);
+            } else {
+                subtraction(file_data[i]);
+            }
+            
         }
     }
     
