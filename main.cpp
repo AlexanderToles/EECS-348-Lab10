@@ -189,10 +189,13 @@ string subtraction(string expression) {
         sum.insert(0, 1, '0' + result);
     }
 
-    //add negative sign to the string
-    sum.insert(0, 1, '-');
+    //add negative sign to the string if needed, add sign back to expression
+    if(sign){
+        sum.insert(0, 1, '-');
+    }
+    
 
-    cout << "sum: " <<sum << "\n";
+    cout << expression <<" + (-123.456) = : " <<sum << "\n";
     return sum;
 }
 
@@ -306,10 +309,11 @@ string addition(string expression){
         }
     }
 
-    //add negative sign
+    //add negative sign and add sign back to expression
     sum.insert(0,1,'-');
+    expression.insert(0,1,'-');
 
-    cout << "sum: " <<sum << "\n";
+    cout << expression <<" + (-123.456) = : " <<sum << "\n";
     return sum;
 }
 
