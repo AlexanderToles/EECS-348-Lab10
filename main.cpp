@@ -10,12 +10,14 @@ string addition(string expression){
     //add together the decimal values from each string
     //carry to the integer addition if necessary.
 
-    const string number = "-123.456";
+    string number = "-123.456";
     string sum;
     bool add = 0; //if the input number is negative, we add instead of subtracting.
 
     if(expression[0]=='-'){
         add = 1;
+        expression.erase(0,1);
+        number.erase(0,1);
     }
 
     //get the position of the decimal in each
@@ -23,11 +25,7 @@ string addition(string expression){
     size_t exp_pos = expression.find_first_of(".");
     size_t num_pos = number.find_first_of(".");
 
-    string min_string = expression;
-    string max_string = number;
-
-    int min_pos = exp_pos;
-    int max_pos = num_pos;
+    
     
     //max_string and max_pos are the larger number, for decimals its the string with more decimal places,
     // and for integers, its the string with more integer places.
@@ -37,131 +35,90 @@ string addition(string expression){
     int sum_size = 0;
     int carry = 0;
 
-    //if the input expression has more decimal places, assign it to max_string and max_pos
-    if(expression.length()-exp_pos > number.length()-num_pos){
-        cout << "input has more decimal places\n";
-        min_pos = num_pos;
-        max_pos = exp_pos;
-        max_string = expression;
-        min_string = number;
-    }
+    string max_string = expression;
+    string min_string = number;
 
-    //indexing for the max starts at the first decimal place
-    int count = max_pos+1;
-
-    //index from the first not shared decimal position, iterating to the max of the string
+    int max_pos = exp_pos;
+    int min_pos = num_pos;
     
-    for(int i = max_pos+1+(min_string.length()-min_pos);i > max_pos+2;--i){
-        cout << i <<"\n";
+
+    int max_dec_len = max(expression.length()-1-exp_pos,number.length()-1-num_pos);
+    int min_dec_len = min(number.length()-1-num_pos,expression.length()-1-exp_pos);
+    
+    if(expression.length()-1-exp_pos < number.length()-1-num_pos){
+        max_string = number;
+        min_string = expression;
+        max_pos = num_pos;
+        min_pos = exp_pos;
+    }
+    int dec_dif = max_dec_len-min_dec_len;
+    int int_dif = (max_string.length()-max_dec_len)-(min_string.length()-min_dec_len);
+    for(int i = 0;i < dec_dif;i++){
+        min_string.push_back('0');
+    }
+    while(max_string.length()!=min_string.length()){
+        if(max_string.length()>min_string.length()){
+            min_string.insert(0,1,'0');
+        }
+        else if (min_string.length()>max_string.length()){
+            max_string.insert(0,1,'0');
+        }
+    }
+    
+    max_pos = max_string.find_first_of(".");
+    min_pos = max_pos;
+
+    cout << "max decimal string: " << max_string << ", " << max_dec_len << "\n";
+    cout << "min decimal string: " << min_string << ", " << min_dec_len << "\n";
+
+    cout << "max_pos: " << max_pos << ", min_pos: " << min_pos << "\n"; 
+    
+
+
+    for(int i = max_string.length()-1;i > max_pos;--i){
         int summand_1 = min_string[i] - '0';
-        int summand_2 = max_string[count] - '0';
+        int summand_2 = max_string[i] - '0';
         result = summand_1 + summand_2+carry;
-        cout << min_string[i] << ", " << max_string[count];
+        cout << min_string[i] << ", " << max_string[i];
         cout <<", "<< result <<"\n";
         if(result>=10){
             carry = 1;
             part_sum = result-10;
             sum.insert(0,1,'0'+part_sum);
-            //cout << sum << "\n";
+            cout << sum << "\n";
         }
         else{
             carry = 0;
             sum.insert(0,1,'0'+result);
-            //cout << sum << "\n";
+            cout << sum << "\n";
         }
 
-        count++;
     }
-    cout << "\nend"<< carry<<" \n\n";
-
-    for(int i = max_pos+(min_string.length()-min_pos);i < max_string.length(); ++i){
-        cout << "if this is triggering there is an issue. \n";
-        int summand_1 = max_string[i] - '0';
-        sum.push_back('0'+summand_1);
-        //cout << sum << "\n";
-    }
-
     sum.insert(0,1,'.');
+    cout << sum << "\n";
+    cout << "-----\n";
 
-    cout << "\n\nintegers:\n\n";
-    //for decimals
-
-    
-    max_pos = num_pos;
-    min_pos = exp_pos;
-    min_string = expression;
-    max_string = number;
-
-    if(exp_pos > num_pos){
-        min_pos = num_pos;
-        max_pos = exp_pos;
-        max_string = expression;
-        min_string = number;
+    for(int i = max_pos-1;i >= 0;--i){
+        int summand_1 = min_string[i] - '0';
+        int summand_2 = max_string[i] - '0';
+        result = summand_1 + summand_2+carry;
+        cout << "i: "<<i<<", "<<min_string[i] << ", " << max_string[i];
+        cout <<", "<< result <<"\n";
+        if(result>=10){
+            carry = 1;
+            part_sum = result-10;
+            sum.insert(0,1,'0'+part_sum);
+            cout << sum << "\n";
+        }
+        else{
+            carry = 0;
+            sum.insert(0,1,'0'+result);
+            cout << sum << "\n";
+        }
     }
-
-    count = max_pos-1;
-
-
-    if(add){
-
-        //add the positive integer values
-        for(int i = min_pos-1  ;i > 0;--i){
-            int summand_1 = min_string[i] - '0';
-            int summand_2 = max_string[count] - '0';
-            result = summand_1 + summand_2+carry;
-            //cout << min_string[i] << ", " << max_string[count];
-            //cout <<", "<< result <<"\n";
-            if(result>=10){
-                carry = 1;
-                part_sum = result-10;
-                sum.insert(0,1,'0'+ part_sum);
-                //cout << sum << "\n";
-            }
-            else{
-                carry = 0;
-                sum.insert(0,1,'0'+result);
-                //cout << sum << "\n";
-            }
-            sum_size++;
-            count--;
-        }
-
-        cout << "end \n";
-
-        for(int i = max_pos-min_pos;i > 0; --i){
-            int summand_1 = max_string[i] - '0';
-            //cout << "String 2: "<< max_string[i] << "\n";
-            int result = summand_1+carry;
-            //cout <<"result: "<<result <<"\n";
-            if(result>=10){
-                carry = 1;
-                part_sum = result-10;
-                sum.insert(0,1,'0'+ part_sum);
-                //cout << sum << "\n";
-            }
-            else{
-                carry = 0;
-                sum.insert(0,1,'0'+result);
-                //cout << sum << "\n";
-            }
-            sum_size++;
-            count--;
-        }
-        if(carry ==1){
-            sum.insert(0,1,'1');
-            //cout << sum << "\n";
-        }
-        sum.insert(0,1,'-');
-        sum.push_back('.');
-        sum_size+=2;
-
-        cout << sum << "\n";
-
-    }
-
-    
+    sum.insert(0,1,'-');
+    cout << sum << "\n";
     return sum;
-
 }
 double convert_expression(const string &expression){
     double parsed_num = 0.0;
